@@ -1,5 +1,5 @@
-﻿using System;
-using BLL;
+﻿using BLL;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConsoleUI
 {
@@ -7,9 +7,16 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            string input = Console.ReadLine();
-            RPNTranslater rpnService = new RPNTranslater();
-            Console.WriteLine(rpnService.ExpressionInRPN(input));
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetService<StartApp>().UserInput();
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddScoped<IRPNExpressionCalculator, RPNExpressionCalculator>();
+            services.AddScoped<StartApp>();
         }
     }
 }

@@ -3,18 +3,26 @@ using System.Text;
 
 namespace BLL
 {
+    /// <summary>
+    /// Class with method ExpressionInRPN.
+    /// </summary>
     public class RPNTranslater
     {
+        /// <summary>
+        /// Translate expresssion from input in RPN format for calculating.
+        /// </summary>
+        /// <param name="inputExpression">input user's expression.</param>
+        /// <returns>return string expression in RPN format.</returns>
         public string ExpressionInRPN(string inputExpression)
         {
             Stack<char> operators = new Stack<char>();
-            StringBuilder output = new StringBuilder("Converted expression in RPN:");
+            StringBuilder output = new StringBuilder();
             StringBuilder numberOutput = new StringBuilder();
 
             for (int i = 0; i < inputExpression.Length; i++)
             {
                 char curChar = inputExpression[i];
-                if (inputExpression.IsDigit(i) || curChar == '.')
+                if (char.IsDigit(curChar) || curChar == ',')
                 {
                     numberOutput.Append(curChar);
                 }
@@ -39,7 +47,7 @@ namespace BLL
                 output.Append($"{operators.Pop()} ");
             }
 
-            return output.ToString();
+            return output.ToString().Trim();
         }
 
         private void CompareOperPrecedence(Stack<char> operators, StringBuilder output, char curChar)
@@ -70,7 +78,6 @@ namespace BLL
             if (curChar == '(')
             {
                 operators.Push(curChar);
-                output.Remove(output.Length - 1, 1);
             }
             else
             {
@@ -82,11 +89,12 @@ namespace BLL
                     }
                     else
                     {
-                        output.Remove(output.Length - 1, 1);
                         operators.Pop();
                     }
                 }
-                while (operators.Contains('('));
+                while (operators.Peek() != '(');
+
+                operators.Pop();
             }
         }
 
@@ -94,8 +102,11 @@ namespace BLL
 
         private void ResetNumberOutput(StringBuilder output, StringBuilder number)
         {
-            output.Append($"{number} ");
-            number.Clear();
+            if (!string.IsNullOrEmpty(number.ToString()))
+            {
+                output.Append($"{number} ");
+                number.Clear();
+            }
         }
 
         private int GetOperatorPriority(char oper)
@@ -108,6 +119,7 @@ namespace BLL
                 { '*', 2 },
                 { '/', 2 },
                 { '%', 2 },
+                { '^', 2 },
             };
             return operatorPriority[oper];
         }
